@@ -157,4 +157,27 @@ router.post('/rate/:userId', auth, async (req, res) => {
     }
 });
 
+// @route    GET /api/user/stats
+// @desc     Get real-time counts for the dashboard
+router.get('/stats', auth, async (req, res) => {
+    try {
+        // 1. Exact count of books you have listed
+        const booksCount = await Book.countDocuments({ userId: req.userId });
+
+        // 2. Exact count of outgoing requests you have made
+        const requestsCount = await Request.countDocuments({ requesterId: req.userId });
+
+        // 3. Exact count of completed exchanges you've participated in
+        const exchangedCount = await Request.countDocuments({
+            $or: [{ ownerId: req.userId }, { requesterId: req.userId }],
+            status: 'received' // In your app, 'received' marks the completion
+        });
+
+        res.json({ booksCount, requestsCount, exchangedCount });
+    } catch (err) {
+        console.error("Stats Error:", err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 module.exports = router;

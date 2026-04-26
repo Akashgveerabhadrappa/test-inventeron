@@ -15,6 +15,7 @@ import Requests from './components/Requests';
 import MyBooks from './components/MyBooks';
 import Profile from './components/Profile';
 import Wishlist from './components/Wishlist';
+import Dashboard from './components/Dashboard'; // Add this line!
 import './App.css';
 
 function App() {
@@ -43,7 +44,7 @@ function App() {
         <main className="container my-4 my-md-5 flex-grow-1">
           <Routes>
             {/* --- REPLACE THE OLD HOME ROUTE --- */}
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={token ? <Dashboard token={token} /> : <Home />} />
             
             <Route path="/about" element={<About />} />
             <Route path="/register" element={<Register />} />
