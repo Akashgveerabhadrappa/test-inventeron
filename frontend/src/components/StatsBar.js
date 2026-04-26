@@ -10,17 +10,21 @@ const StatsBar = ({ token }) => {
 
     useEffect(() => {
         const fetchStats = async () => {
+            if (!token) return;
+            
             try {
                 // This calls the new route you added to userRoutes.js
                 const res = await axios.get('http://localhost:5000/api/user/stats', {
-                    headers: { 'x-auth-token': token }
+                    headers: { 
+        'Authorization': `Bearer ${token}` 
+    }
                 });
                 
-                setStats({
-                    books: res.data.booksCount,
-                    users: res.data.usersCount || 0, // Ensure these keys match your backend res.json
-                    exchanges: res.data.exchangedCount
-                });
+            setStats({
+                books: res.data.booksCount,        // Correctly maps to "My Books Listed"
+                users: res.data.usersCount,     // Maps requests to "Active Members" (or update labels)
+                exchanges: res.data.exchangedCount // Correctly maps to "Exchanges Completed"
+            });
             } catch (err) {
                 console.error("Error fetching real-time stats:", err);
             }
