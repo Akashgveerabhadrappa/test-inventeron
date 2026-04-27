@@ -417,3 +417,117 @@ main.container {
   50% { opacity: 1; }
   100% { opacity: 0.4; }
 }
+
+/* Add these to your frontend/src/App.css */
+
+.how-it-works-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  background: var(--surface);
+  transition: var(--transition);
+}
+
+/* Icon Container Styling */
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  background: rgba(79, 70, 229, 0.08); /* Light Indigo background */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.icon-circle img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+/* Hover Effect for the whole card */
+.how-it-works-card:hover .icon-circle {
+  background: var(--primary);
+  transform: scale(1.1);
+}
+
+.how-it-works-card:hover .icon-circle img {
+  filter: brightness(0) invert(1); /* Turns icon white if it's a dark PNG/SVG */
+}
+
+/* Typography alignment */
+.how-it-works-card p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+
+
+
+
+
+/* frontend/src/App.css Updates */
+
+/* --- FOOTER VISIBILITY FIX --- */
+.app-footer {
+  background: #0f172a; /* Solid deep slate */
+  color: #94a3b8; /* Light slate for readable body text */
+  padding: 5rem 0 2rem;
+}
+
+.footer-heading {
+  color: #ffffff !important; /* Ensure headings are bright white */
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1.5rem;
+}
+
+.footer-link-list a {
+  color: #cbd5e1 !important; /* Lighter link color for better contrast */
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.footer-link-list a:hover {
+  color: #ffffff !important;
+  padding-left: 5px;
+}
+
+.footer-copyright {
+  color: #64748b !important;
+}
+
+/* --- JOIN NOW BUTTON & SECONDARY BUTTONS --- */
+.btn-outline-secondary {
+  border: 1px solid var(--border-color) !important;
+  background-color: var(--surface) !important;
+  color: var(--text-main) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px);
+}
+
+/* Specific styling for the Hero secondary button (Join Now) */
+.btn-lg.btn-outline-secondary {
+  padding: 0.7rem 2rem;
+  font-weight: 600;
+}
+
+/* --- NEWSLETTER INPUT FIX --- */
+.newsletter-input::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+
+
+
