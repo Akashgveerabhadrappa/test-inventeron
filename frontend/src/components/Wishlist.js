@@ -56,10 +56,13 @@ export default function Wishlist({ token }) {
     const handleConfirmRemove = async () => {
         if (!bookToRemove) return;
         try {
-            await fetch(`http://localhost:5000/api/user/wishlist/${bookToRemove._id}`, {
+            const res = await fetch(`http://localhost:5000/api/user/wishlist/${bookToRemove._id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Failed to remove from wishlist');
+
             toast.success('Book removed from your wishlist!');
             setWishlist(prevWishlist => prevWishlist.filter(book => book._id !== bookToRemove._id));
         } catch (error) {

@@ -28,9 +28,16 @@ export default function Requests({ token }) {
   }, [token, navigate]);
 
   const handleStatusUpdate = async (id, status) => {
-    await fetch(`http://localhost:5000/api/requests/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ status }),});
-    setRequests(requests.map(req => req._id === id ? { ...req, status } : req));
-    toast.success(`Request has been ${status}.`);
+    try {
+      const res = await fetch(`http://localhost:5000/api/requests/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ status }),});
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to update request');
+
+      setRequests(requests.map(req => req._id === id ? { ...req, status } : req));
+      toast.success(`Request has been ${status}.`);
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
   
   const viewContact = async (id) => {
@@ -45,10 +52,13 @@ export default function Requests({ token }) {
   // --- THIS IS THE MISSING FUNCTION ---
   const handleMarkAsSent = async (requestId) => {
     try {
-      await fetch(`http://localhost:5000/api/requests/${requestId}/sent`, {
+      const res = await fetch(`http://localhost:5000/api/requests/${requestId}/sent`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.msg || data.message || 'Failed to mark as sent');
+
       setRequests(requests.map(req => req._id === requestId ? { ...req, deliveryStatus: 'sent' } : req));
       toast.success('Marked as sent! Waiting for receiver to confirm.');
     } catch (error) { toast.error(error.message || 'Failed to mark as sent'); }
@@ -67,10 +77,13 @@ export default function Requests({ token }) {
   const handleConfirmDelivery = async () => {
     if (!requestToDeliver) return;
     try {
-      await fetch(`http://localhost:5000/api/requests/${requestToDeliver._id}/receive`, {
+      const res = await fetch(`http://localhost:5000/api/requests/${requestToDeliver._id}/receive`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.msg || data.message || 'Failed to confirm receipt');
+
       setRequests(requests.map(req => req._id === requestToDeliver._id ? { ...req, deliveryStatus: 'received' } : req));
       toast.success('Receipt confirmed! The transaction is complete.');
     } catch (error) {
@@ -90,11 +103,14 @@ export default function Requests({ token }) {
     const userToRateId = currentUserId === requestToRate.ownerId._id ? requestToRate.requesterId._id : requestToRate.ownerId._id;
     const isOwnerRating = currentUserId === requestToRate.ownerId._id;
     try {
-        await fetch(`http://localhost:5000/api/user/rate/${userToRateId}`, {
+        const res = await fetch(`http://localhost:5000/api/user/rate/${userToRateId}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ rating, comment, requestId: requestToRate._id })
         });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Failed to submit rating');
+
         toast.success("Thank you for your rating!");
         setRequests(requests.map(r => {
           if (r._id === requestToRate._id) {
@@ -104,7 +120,7 @@ export default function Requests({ token }) {
         }));
         setShowRatingModal(false);
     } catch (error) { 
-        toast.error("Failed to submit rating"); 
+        toast.error(error.message); 
     }
   };
 

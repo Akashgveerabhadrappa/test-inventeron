@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const RatingSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User' },
+    requestId: { type: Schema.Types.ObjectId, ref: 'Request' },
     rating: { type: Number, required: true, min: 1, max: 5 },
     comment: { type: String, trim: true },
     createdAt: { type: Date, default: Date.now }

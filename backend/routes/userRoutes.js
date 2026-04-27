@@ -130,10 +130,25 @@ router.post('/rate/:userId', auth, async (req, res) => {
         const request = await Request.findById(requestId);
         if (!request) return res.status(404).json({ message: 'Associated request not found.' });
 
+        const isRaterTheOwner = request.ownerId.equals(req.userId);
+        const isRaterTheRequester = request.requesterId.equals(req.userId);
+        if (!isRaterTheOwner && !isRaterTheRequester) {
+            return res.status(403).json({ message: 'You are not authorized to rate this exchange.' });
+        }
+
+        const expectedRatedUserId = isRaterTheOwner ? request.requesterId : request.ownerId;
+        if (!expectedRatedUserId.equals(req.params.userId)) {
+            return res.status(400).json({ message: 'Rated user does not match this exchange.' });
+        }
+
+        if (request.deliveryStatus !== 'received') {
+            return res.status(400).json({ message: 'You can only rate completed exchanges.' });
+        }
+
         // Add the rating to the user's profile
-        const newRating = { user: req.userId, rating, comment };
+        const newRating = { user: req.userId, requestId: request._id, rating, comment };
         // Avoid duplicate ratings from the same user on the same transaction, update if exists
-        const existingRatingIndex = userToRate.ratings.findIndex(r => r.user.equals(req.userId) && request._id.equals(r.requestId));
+        const existingRatingIndex = userToRate.ratings.findIndex(r => r.user.equals(req.userId) && r.requestId?.equals(request._id));
         if (existingRatingIndex > -1) {
             userToRate.ratings[existingRatingIndex] = newRating;
         } else {
@@ -142,7 +157,6 @@ router.post('/rate/:userId', auth, async (req, res) => {
         await userToRate.save();
 
         // --- NEW LOGIC: Update the correct isRated flag ---
-        const isRaterTheOwner = request.ownerId.equals(req.userId);
         if (isRaterTheOwner) {
             request.isRatedByOwner = true;
         } else {
@@ -164,13 +178,19 @@ router.get('/stats', auth, async (req, res) => {
         const booksCount = await Book.countDocuments({ userId: req.userId });
         const totalUsers = await User.countDocuments(); // Add this line
         const exchangedCount = await Request.countDocuments({
-            $or: [
-                { ownerId: req.userId }, 
-                { requesterId: req.userId }
-            ],
-            $or: [
-                { deliveryStatus: 'received' },
-                { isDelivered: true }
+            $and: [
+                {
+                    $or: [
+                        { ownerId: req.userId }, 
+                        { requesterId: req.userId }
+                    ]
+                },
+                {
+                    $or: [
+                        { deliveryStatus: 'received' },
+                        { isDelivered: true }
+                    ]
+                }
             ]
         });
 

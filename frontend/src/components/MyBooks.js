@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ConfirmationModal from './ConfirmationModal';
@@ -9,16 +9,10 @@ export default function MyBooks({ token }) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [bookToDelete, setBookToDelete] = useState(null);
 
-  useEffect(() => {
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-    fetchMyBooks();
-  }, [token, navigate]); // Removed fetchMyBooks from here to prevent loops
-
   // We define fetchMyBooks outside useEffect so it can be called again after a deletion
-  const fetchMyBooks = async () => {
+  const fetchMyBooks = useCallback(async () => {
+    if (!token) return;
+
     try {
       const res = await fetch('http://localhost:5000/api/books/my-books', {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -29,7 +23,15 @@ export default function MyBooks({ token }) {
     } catch (error) {
       toast.error(error.message);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    fetchMyBooks();
+  }, [token, navigate, fetchMyBooks]);
 
   const handleDeleteClick = (book) => {
     setBookToDelete(book);
