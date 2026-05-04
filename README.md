@@ -2,7 +2,6 @@
 
 BookExchange is a dynamic and feature-rich web application built with the MERN stack, designed to create a community for book lovers to lend, sell, and discover new books. This project demonstrates a complete full-stack development cycle, from backend API design and database management to a responsive, interactive frontend and real-time communication.
 
-
 ## Key Features
 
 -   **Full User Authentication:** Secure user registration and login system using JSON Web Tokens (JWT) and `bcrypt.js` for password hashing.
